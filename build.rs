@@ -40,7 +40,7 @@ fn main() {
         );
     }
 
-    if feature!("LAPACKE") {
+    if !feature!("NOFORTRAN") {
         println!("cargo:rustc-link-lib=dylib=gfortran");
     }
     println!("cargo:rustc-link-lib={}=openblas", kind);

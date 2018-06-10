@@ -36,6 +36,7 @@ cblas = []
 lapacke = []
 static = []
 system = []
+nofortran = []
 
 [dev-dependencies]
 libc = "0.2"
