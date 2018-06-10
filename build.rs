@@ -19,21 +19,21 @@ fn main() {
         let source = PathBuf::from("source");
         let output = PathBuf::from(variable!("OUT_DIR").replace(r"\", "/"));
         env::remove_var("TARGET");
-        run(
-            Command::new("make")
-                .args(&["libs", "netlib", "shared"])
-                .arg(format!("BINARY={}", binary!()))
-                .arg(format!("{}_CBLAS=1", switch!(cblas)))
-                .arg(format!("{}_LAPACKE=1", switch!(lapacke)))
-                .arg(format!("-j{}", variable!("NUM_JOBS")))
-                .current_dir(&source),
-        );
-        run(
-            Command::new("make")
-                .arg("install")
-                .arg(format!("DESTDIR={}", output.display()))
-                .current_dir(&source),
-        );
+        run(Command::new("make")
+            .args(&["libs", "netlib", "shared"])
+            .arg(format!(
+                "NUM_THREADS={}",
+                env::var("OPENBLAS_NUM_THREADS").unwrap_or("128".into())
+            ))
+            .arg(format!("BINARY={}", binary!()))
+            .arg(format!("{}_CBLAS=1", switch!(cblas)))
+            .arg(format!("{}_LAPACKE=1", switch!(lapacke)))
+            .arg(format!("-j{}", variable!("NUM_JOBS")))
+            .current_dir(&source));
+        run(Command::new("make")
+            .arg("install")
+            .arg(format!("DESTDIR={}", output.display()))
+            .current_dir(&source));
         println!(
             "cargo:rustc-link-search={}",
             output.join("opt/OpenBLAS/lib").display(),
